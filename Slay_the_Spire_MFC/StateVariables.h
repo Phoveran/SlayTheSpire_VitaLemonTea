@@ -35,8 +35,8 @@ public:
 	int HandPoint;//手牌数
 	int* HandPtr;//手牌数指针
 	int StrengthUp;//每回合增加力量
-	int Vulnerable;//易伤
-	int Weak;//虚弱
+	int State_Vulnerable;//易伤
+	int State_Weak;//虚弱
 	int Berserk;//下回合开始获得Energy
 	int Frail;//脆弱
 	int CanDraw;//是否可继续摸牌
@@ -63,7 +63,7 @@ public:
 class Enemy
 {
 public:
-	Enemy(int hp, unsigned int damage1, unsigned int attackTimes1 = 1, unsigned int damage2 = 0, unsigned int attackTimes2 = 0, unsigned int damage3 = 0, unsigned int attackTimes3 = 0);
+	Enemy(int hp, int damage1, int attackTimes1 = 1, int damage2 =0, int attackTimes2 = 0, int damage3 = 0, int attackTimes3 = 0);
 	~Enemy(void);
 	int EnemyHP;//怪物血量
 	int EnemyBlock;//怪物护盾
@@ -78,15 +78,19 @@ public:
 	int State_Vulnerable;//易伤
 	int State_Poison;//中毒
 	int State_Ritual;//仪式：回合结束加攻
-	int strength;//力量，攻击附加伤害
+	int Strength;//力量，攻击附加伤害
 	int intend;//下次执行命令
+	int Dexterity;
 
 	void debuffWeak(int n, StateVariables* player);//上n层虚弱
 	void debuffMucus(int n, StateVariables* player);//给粘液牌
 	void debuffVulnerable(int n, StateVariables* player);//上n层易伤
 	void buffRitual();//仪式效果
-	void buffStrengthUp(unsigned int n);//加n力量
+	void buffStrengthUp(int n);//加n力量
 	void buffFrail(int n, StateVariables* player);//上n层破甲
+	void attack(int attackMethod, StateVariables* player);//发动攻击
+	void damage(int damage, StateVariables* target);//伤害函数
+	void deffend(int deffendVal);//护盾函数
 };
 
 class Cards
@@ -95,7 +99,8 @@ public:
 	Cards(int cardnum, int EnergyCost);
 	~Cards(void);
 	unsigned int CardsNum;//卡牌编号
-	unsigned int EnergyCost;//费用
+	int EnergyCost;//费用
+
 	int EnergyConsume(StateVariables* player);
 	void Damage(int damage, StateVariables* player, Enemy* target, int n);
 	void Defence(int block, StateVariables* player, Enemy* target);

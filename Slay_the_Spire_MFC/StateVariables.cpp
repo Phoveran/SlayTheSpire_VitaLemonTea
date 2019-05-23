@@ -36,14 +36,15 @@ StateVariables::StateVariables(void)
 	DiscardPtr = &DiscardPoint;
 	HandPoint = 0;
 	HandPtr = &HandPoint;
-	Vulnerable = 0;
-	Weak = 0;
+	State_Vulnerable = 0;
+	State_Weak = 0;
 	Strength = 0;
 	StrengthUp = 0;
 	StrengthUpTemp = 0;
 	Dexterity = 0;
 	DexterityUpTemp = 0;
 	CanDraw = 1;
+	Frail = 0;
 	FlameBarrier = 0;
 	Berserk = 0;
 	Juggernaut = 0;//Juggernaut效果
@@ -607,7 +608,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				target->strength -= 2;
+				target->Strength -= 2;
 				break;
 			}
 			else
@@ -618,7 +619,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				target->strength -= 3;
+				target->Strength -= 3;
 				break;
 			}
 			else
@@ -808,7 +809,7 @@ void StateVariables::Defend(int DefendVal, Enemy* target = NULL, int EnemyNum = 
 	}
 	else
 	{
-		Block += DefendVal + Dexterity;
+		Block += (DefendVal + Dexterity);
 	}
 	if (Juggernaut)
 	{

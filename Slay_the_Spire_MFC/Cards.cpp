@@ -25,7 +25,7 @@ int Cards::EnergyConsume(StateVariables* player)
 
 void Cards::Damage(int damage, StateVariables* player, Enemy* target, int n = 0)
 {
-	double WeakCoefficient = (player->Weak > 0) ? 0.75 : 1;
+	double WeakCoefficient = (player->State_Weak > 0) ? 0.75 : 1;
 	double Vulnerable = (target->State_Vulnerable > 0) ? 1.5 : 1;
 	int pre_damage = int((damage + player->Strength) * WeakCoefficient * Vulnerable);
 	if (pre_damage < 0)
