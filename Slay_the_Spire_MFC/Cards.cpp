@@ -1,3 +1,4 @@
+
 #include "stdafx.h"
 #include "StateVariables.h"
 
@@ -22,39 +23,53 @@ int Cards::EnergyConsume(int x, StateVariables* player)
 	}
 }
 
-void Cards::Damage(int damage, Enemy* target, int n)
+void Cards::Damage(int damage, StateVariables* player, Enemy* target, int n = 0)
 {
+	double WeakCoefficient = (player->Weak > 0) ? 0.75 : 1;
+	double Vulnerable = (target->State_Vulnerable > 0) ? 1.5 : 1;
+	int pre_damage = int((damage + player->Strength) * WeakCoefficient * Vulnerable);
+	if (pre_damage < 0)
+		pre_damage = 0;
 	if (n)
 	{
 		int iter;
 		for (iter = 0; iter < n; iter++)
 		{
-			if ((target + iter)->EnemyBlock >= damage)
+			if ((target + iter)->EnemyBlock >= pre_damage)
 			{
-				(target + iter)->EnemyBlock -= damage;
+				(target + iter)->EnemyBlock -= pre_damage;
 			}
 			else
 			{
-				(target + iter)->EnemyHP -= (damage - (target + iter)->EnemyBlock);
+				(target + iter)->EnemyHP -= (pre_damage - (target + iter)->EnemyBlock);
 				(target + iter)->EnemyBlock = 0;
 			}
 		}
 	}
 	else
 	{
-		if (target->EnemyBlock >= damage)
+		if (target->EnemyBlock >= pre_damage)
 		{
-			target->EnemyBlock -= damage;
+			target->EnemyBlock -= pre_damage;
 		}
 		else
 		{
-			target->EnemyHP -= (damage - (target->EnemyBlock));
+			target->EnemyHP -= (pre_damage - (target->EnemyBlock));
 			target->EnemyBlock = 0;
 		}
 	}
 }
 
-void Cards::Defend(int defend, StateVariables* player, Enemy* target, int EnemyNum)
+void Cards::Defence(int block, StateVariables * player, Enemy* target = NULL)
 {
-	player->Defend(defend, target, EnemyNum);
+	double FrailCoefficient = (player->Frail > 0) ? 0.75 : 1;
+	int pre_block = int((block + player->Dexterity) * FrailCoefficient);
+	if (pre_block >= 0)
+	{
+		if (player->Juggernaut)
+		{
+			player->randomDamage(player->Juggernaut, target, player->EnemyNum);
+		}
+		player->Block += pre_block;
+  }
 }
