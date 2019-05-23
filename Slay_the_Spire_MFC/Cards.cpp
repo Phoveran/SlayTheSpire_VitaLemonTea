@@ -12,13 +12,13 @@ Cards::~Cards(void)
 {
 }
 
-int Cards::EnergyConsume(int x, StateVariables* player)
+int Cards::EnergyConsume(StateVariables* player)
 {
-	if (player->Energy < x)
+	if (player->Energy < EnergyCost)
 		return 0;
 	else
 	{
-		player->Energy -= x;
+		player->Energy -= EnergyCost;
 		return 1;
 	}
 }

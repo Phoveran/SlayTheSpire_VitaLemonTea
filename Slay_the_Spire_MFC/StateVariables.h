@@ -51,12 +51,12 @@ public:
 	int EnemyNum;//怪物数量
 
 	void draw(int drawnum);
-	void usecard(int cardnum, Enemy* target, int n, Cards* GameDeck[], StateVariables* player);
+	void usecard(int cardnum, Enemy* target, int n);
 	void addTo(int cardnum, int Pile[], int* pilePoint);
 	void randomDamage(int damage, Enemy* target, int n);
 	void combust(Enemy* target, int EnemyNum);
 	void metallicize(Enemy* target, int EnemyNum);
-	void Dexup(int DexupVal, Enemy* target, int EnemyNum);
+	void Defend(int DefendVal, Enemy* target, int EnemyNum);
 	void brutality(void);
 };
 
@@ -96,7 +96,7 @@ public:
 	~Cards(void);
 	unsigned int CardsNum;//卡牌编号
 	unsigned int EnergyCost;//费用
-	int EnergyConsume(int x, StateVariables* player);
+	int EnergyConsume(StateVariables* player);
 	void Damage(int damage, StateVariables* player, Enemy* target, int n);
 	void Defence(int block, StateVariables* player, Enemy* target);
 };
