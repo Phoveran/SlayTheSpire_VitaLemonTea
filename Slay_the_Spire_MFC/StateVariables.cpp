@@ -43,6 +43,7 @@ StateVariables::StateVariables(void)
 	StrengthUpTemp = 0;
 	Dexterity = 0;
 	DexterityUpTemp = 0;
+	CantAttack = 0;
 	CanDraw = 1;
 	Frail = 0;
 	FlameBarrier = 0;
@@ -73,7 +74,7 @@ void StateVariables::draw(int drawnum)
 	*DrawPtr = *DrawPtr - drawnum;
 };
 
-void StateVariables::addTo(int cardnum, int PileExample[], int* pilePoint)
+void StateVariables::addTo(int cardnum, Cards* PileExample[], int* pilePoint)
 {
 	srand((unsigned int)(time(NULL)));
 	int i = random(*pilePoint);
@@ -82,7 +83,7 @@ void StateVariables::addTo(int cardnum, int PileExample[], int* pilePoint)
 	{
 		PileExample[j + 1] = PileExample[j];
 	}
-	PileExample[i] = cardnum;
+	PileExample[i] = GameDeck[cardnum];
 	*pilePoint += 1;
 }
 

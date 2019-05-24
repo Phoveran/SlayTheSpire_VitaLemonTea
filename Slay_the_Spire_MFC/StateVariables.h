@@ -26,8 +26,8 @@ public:
 	int DeckPoint;//玩家牌库牌数
 	int* DeckPtr;//玩家牌库牌数指针
 	int DrawNum;
-	int DrawPile[100];//抽牌堆数组
-	int DiscardPile[100];
+	Cards* DrawPile[100];//抽牌堆
+	Cards* DiscardPile[100];
 	int DrawPoint;//抽牌堆牌数
 	int* DrawPtr;//抽牌堆牌数指针
 	int DiscardPoint;//弃牌堆牌数
@@ -39,6 +39,7 @@ public:
 	int State_Weak;//虚弱
 	int Berserk;//下回合开始获得Energy
 	int Frail;//脆弱
+	int CantAttack;//几回合内不能打出攻击
 	int CanDraw;//是否可继续摸牌
 	int FlameBarrier;//火焰屏障效果
 	int Juggernaut;//势不可挡效果
@@ -52,7 +53,7 @@ public:
 
 	void draw(int drawnum);
 	void usecard(int cardnum, Enemy* target, int n);
-	void addTo(int cardnum, int Pile[], int* pilePoint);
+	void addTo(int cardnum, Cards* PileExample[], int* pilePoint);
 	void randomDamage(int damage, Enemy* target, int n);
 	void combust(Enemy* target, int EnemyNum);
 	void metallicize(Enemy* target, int EnemyNum);
@@ -64,6 +65,7 @@ class Enemy
 {
 public:
 	Enemy(int hp, int damage1, int attackTimes1 = 1, int damage2 =0, int attackTimes2 = 0, int damage3 = 0, int attackTimes3 = 0);
+	Enemy(Enemy &example);
 	~Enemy(void);
 	int EnemyHP;//怪物血量
 	int EnemyBlock;//怪物护盾
@@ -83,7 +85,7 @@ public:
 	int Dexterity;
 
 	void debuffWeak(int n, StateVariables* player);//上n层虚弱
-	void debuffMucus(int n, StateVariables* player);//给粘液牌
+	void debuffCards(int cardnum, int n, StateVariables* player);//给弃牌堆牌
 	void debuffVulnerable(int n, StateVariables* player);//上n层易伤
 	void buffRitual();//仪式效果
 	void buffStrengthUp(int n);//加n力量
@@ -91,6 +93,7 @@ public:
 	void attack(int attackMethod, StateVariables* player);//发动攻击
 	void damage(int damage, StateVariables* target);//伤害函数
 	void deffend(int deffendVal);//护盾函数
+	void net(int n, StateVariables* player);//丢网技能
 };
 
 class Cards
