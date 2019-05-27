@@ -19,7 +19,7 @@ public:
 	int Dexterity;//敏捷
 	int DexterityUpTemp;//单回合增加的敏捷
 	int Gold;//金币
-	int Hand[10];//手牌
+	Cards* Hand[10];//手牌
 	Cards* GameDeck[300];//游戏牌库
 	int GameDeckPoint;//游戏牌库牌数
 	Cards* Deck[100];//玩家牌库

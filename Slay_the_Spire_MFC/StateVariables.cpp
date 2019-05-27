@@ -282,7 +282,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				usecard(DrawPile[DrawPoint - 1], target, n); //消耗功能没实现
+				usecard(DrawPile[DrawPoint - 1]->CardsNum, target, n); //消耗功能没实现
 				DrawPile[DrawPoint - 1] = 0;
 				*DrawPtr -= 1;
 				break;
@@ -295,7 +295,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				usecard(DrawPile[DrawPoint - 1], target, n); //消耗功能没实现
+				usecard(DrawPile[DrawPoint - 1]->CardsNum, target, n); //消耗功能没实现
 				DrawPile[DrawPoint - 1] = 0;
 				*DrawPtr -= 1;
 				break;
