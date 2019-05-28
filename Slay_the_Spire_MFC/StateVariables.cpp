@@ -30,13 +30,9 @@ StateVariables::StateVariables(void)
 	}
 	DrawNum = 5;//每回合抽5张牌
 	DeckPoint = 10;
-	DeckPtr = &DeckPoint;
 	DrawPoint = 0;
-	DrawPtr = &DrawPoint;
 	DiscardPoint = 0;
-	DiscardPtr = &DiscardPoint;
 	HandPoint = 0;
-	HandPtr = &HandPoint;
 	State_Vulnerable = 0;
 	State_Weak = 0;
 	Frail = 0;
@@ -64,18 +60,18 @@ StateVariables::~StateVariables(void)
 }
 
 
-void StateVariables::shuffle(Cards* Pile[], int* pilePoint)
+void StateVariables::shuffle(Cards* Pile[], int pilePoint)
 {
 	int iter;
 	int i, j;
-	if (*pilePoint == 1)
+	if (pilePoint == 1)
 		return;
-	for (iter = 1; iter <= 3 * (*pilePoint); iter++)
+	for (iter = 1; iter <= 3 * (pilePoint); iter++)
 	{
-		int i = random(*pilePoint);
-		int j = random(*pilePoint);
+		int i = random(pilePoint);
+		int j = random(pilePoint);
 		while (j == i)
-			j = random(*pilePoint);
+			j = random(pilePoint);
 		Cards* hold = Pile[i];
 		Pile[i] = Pile[j];
 		Pile[j] = hold;
@@ -85,57 +81,71 @@ void StateVariables::shuffle(Cards* Pile[], int* pilePoint)
 void StateVariables::draw(int drawnum)
 {
 	int i;
-	if (*DrawPtr < drawnum)
+	if (DrawPoint < drawnum)
 	{
-		if ((*DrawPtr + *DiscardPtr) < drawnum)
-			draw(*DrawPtr + *DiscardPtr);
+		if ((DrawPoint + DiscardPoint) < drawnum)
+			draw(DrawPoint + DiscardPoint);
 		else
 		{
-			drawnum -= *DrawPtr;
-			draw(*DrawPtr);
-			for (i = 0; i < *DiscardPtr; i++)
+			int drawnum_1 = drawnum - DrawPoint;
+			draw(DrawPoint);
+			for (i = 0; i < DiscardPoint; i++)
 			{
 				DrawPile[i] = DiscardPile[i];
 				DiscardPile[i] = 0;
 			}
-			*DrawPtr = *DiscardPtr;
-			shuffle(DrawPile, DrawPtr);
-			*DiscardPtr = 0;
+			DrawPoint = DiscardPoint;
+			shuffle(DrawPile, DrawPoint);
+			DiscardPoint = 0;
+			draw(drawnum_1);
 		}
 	}
 	for (i = 0; i < drawnum; i++)
 	{
-		Hand[*HandPtr + i + 1] = DrawPile[*DrawPtr - i];
-		DrawPile[*DrawPtr - i] = 0;
+		Hand[HandPoint + i + 1] = DrawPile[DrawPoint - i];
+		DrawPile[DrawPoint - i] = 0;
 	}
-	*HandPtr = *HandPtr + drawnum;
-	*DrawPtr = *DrawPtr - drawnum;
+	HandPoint = HandPoint + drawnum;
+	DrawPoint = DrawPoint - drawnum;
 };
 
-void StateVariables::addTo(int cardnum, Cards* PileExample[], int* pilePoint)
+void StateVariables::addToDiscard(int cardnum)
 {
 	srand((unsigned int)(time(NULL)));
-	int i = random(*pilePoint);
+	int i = random(DiscardPoint);
 	int j;
-	for (j = *pilePoint - 1; j > i; j--)
+	for (j = DiscardPoint - 1; j > i; j--)
 	{
-		PileExample[j + 1] = PileExample[j];
+		DiscardPile[j + 1] = DiscardPile[j];
 	}
-	PileExample[i] = GameDeck[cardnum];
-	*pilePoint += 1;
+	DiscardPile[i] = GameDeck[cardnum];
+	DiscardPoint += 1;
 }
 
 void StateVariables::addToHand(int cardnum)
 {
-	if (*HandPtr <= 9)
+	if (HandPoint <= 9)
 	{
-		Hand[*HandPtr] = GameDeck[cardnum];
-		*HandPtr += 1;
+		Hand[HandPoint] = GameDeck[cardnum];
+		HandPoint += 1;
 	}
 	else
 	{
-		addTo(cardnum, DiscardPile, DiscardPtr);
+		addToDiscard(cardnum);
 	}
+}
+
+void StateVariables::addToDraw(int cardnum)
+{
+	srand((unsigned int)(time(NULL)));
+	int i = random(DrawPoint);
+	int j;
+	for (j = DrawPoint - 1; j > i; j--)
+	{
+		DrawPile[j + 1] = DrawPile[j];
+	}
+	DrawPile[i] = GameDeck[cardnum];
+	DrawPoint += 1;
 }
 
 void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
@@ -146,7 +156,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 	    {
 		    if (GameDeck[cardnum]->EnergyConsume(this))
 		    {
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(8, this, target, 0);
 			    target->State_Vulnerable += 2;
 			    break;
@@ -159,7 +169,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 	    {
 		    if (GameDeck[cardnum]->EnergyConsume(this))
 		    {
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(11, this, target, 0);
 			    target->State_Vulnerable += 10;
 			    break;
@@ -172,7 +182,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 	    {
 		    if (GameDeck[cardnum]->EnergyConsume(this))
 		    {
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(5, this, NULL);
 				break;
 		    }
@@ -184,7 +194,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(8, this, NULL);
 				break;
 			}
@@ -196,7 +206,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(6, this, target, 0);
 				break;
 			}
@@ -208,7 +218,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(9, this, target, 0);
 				break;
 			}
@@ -220,9 +230,9 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(6, this, target, 0);
-				addTo(4, DiscardPile, DiscardPtr);
+				addToDiscard(4);
 				break;
 			}
 			else
@@ -233,9 +243,9 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(9, this, target, 0);
-				addTo(204, DiscardPile, DiscardPtr);
+				addToDiscard(204);
 				break;
 			}
 			else
@@ -247,9 +257,9 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				int i = 0;
-				for (; i < *HandPtr; i++)
+				for (; i < HandPoint; i++)
 				{
 					//Upgrade[Hand[i]];
 				}
@@ -264,7 +274,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(this->Block, this, target, 0);
 				break;
 			}
@@ -276,7 +286,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(this->Block, this, target, 0);
 				break;
 			}
@@ -288,12 +298,12 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
 				int i = 0;
-				for (; i < *HandPtr; i++)
+				for (; i < HandPoint; i++)
 				{
 					if (Hand[i]->Kind != 0)
 						return;
 				}
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(14, this, target, 0);
 				break;
 			}
@@ -306,12 +316,12 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
 				int i = 0;
-				for (; i < *HandPtr; i++)
+				for (; i < HandPoint; i++)
 				{
 					if (Hand[i]->Kind != 0)
 						return;
 				}
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(18, this, target, 0);
 				break;
 			}
@@ -323,7 +333,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(8, this, target, EnemyNum);
 				break;
 			}
@@ -335,7 +345,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(11, this, target, EnemyNum);
 				break;
 			}
@@ -347,7 +357,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(12, this, target, 0);
 				target->State_Weak += 2;
 				break;
@@ -360,7 +370,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(14, this, target, 0);
 				target->State_Weak += 3;
 				break;
@@ -373,7 +383,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				this->Strength += 2;
 				this->StrengthUpTemp += 2;
 				break;
@@ -386,7 +396,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				this->Strength += 4;
 				this->StrengthUpTemp += 4;
 				break;
@@ -399,10 +409,10 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				usecard(DrawPile[DrawPoint - 1]->CardsNum, target, n); //消耗功能没实现
 				DrawPile[DrawPoint - 1] = 0;
-				*DrawPtr -= 1;
+				DrawPoint -= 1;
 				break;
 			}
 			else
@@ -413,10 +423,10 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				usecard(DrawPile[DrawPoint - 1]->CardsNum, target, n); //消耗功能没实现
 				DrawPile[DrawPoint - 1] = 0;
-				*DrawPtr -= 1;
+				DrawPoint -= 1;
 				break;
 			}
 			else
@@ -429,7 +439,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(9 + this->Strength * 2, this, target, 0);
 				break;
 			}
@@ -441,7 +451,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(12 + this->Strength * 4, this, target, 0);
 				break;
 			}
@@ -453,7 +463,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(5, this, NULL);
 				GameDeck[cardnum]->Damage(5, this, target, 0);
 				break;
@@ -465,7 +475,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(7, this, NULL);
 				GameDeck[cardnum]->Damage(7, this, target, 0);
 				break;
@@ -478,7 +488,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 		    if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				int strikeSum;
 				for (int i = 0; i < DeckPoint; i++)
 				{
@@ -498,7 +508,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				int strikeSum = 0;
 				for (int i = 0; i < DeckPoint; i++)
 				{
@@ -519,7 +529,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(9, this, target, 0);
 				draw(1);
 				break;
@@ -531,7 +541,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(10, this, target, 0);
 				draw(2);
 				break;
@@ -544,7 +554,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(8, this, NULL);
 				draw(1);
 				break;
@@ -557,7 +567,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(11, this, NULL);
 				draw(1);
 				break;
@@ -570,7 +580,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				randomDamage(3, NULL, 3);
 				break;
 			}
@@ -582,7 +592,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				randomDamage(3, NULL, 4);
 				break;
 			}
@@ -594,7 +604,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(4, this, NULL, EnemyNum);
 				int iter;
 				for (iter = 0; iter < EnemyNum; iter++)
@@ -611,7 +621,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(7, this, NULL, EnemyNum);
 				int iter;
 				for (iter = 0; iter < EnemyNum; iter++)
@@ -630,7 +640,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(5, this, target, 0);
 				GameDeck[cardnum]->Damage(5, this, target, 0);
 				break;
@@ -643,7 +653,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(7, this, target, 0);
 				GameDeck[cardnum]->Damage(7, this, target, 0);
 				break;
@@ -658,9 +668,9 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(11, this, target, 0);
-				addTo(131, DrawPile, DrawPtr);
+				addToDraw(131);
 				break;
 			}
 			else
@@ -670,9 +680,9 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(14, this, target, 0);
-				addTo(131, DrawPile, DrawPtr);
+				addToDraw(131);
 				break;
 			}
 			else
@@ -683,7 +693,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				draw(3);
 				this->CanDraw = 0;
 				break;
@@ -696,7 +706,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				draw(4);
 				this->CanDraw = 0;
 				break;
@@ -711,7 +721,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				this->HP -= 3;
 				this->Energy += 1;
 				break;
@@ -724,7 +734,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				this->HP -= 3;
 				this->Energy += 2;
 				break;
@@ -739,7 +749,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(20, this, target, 0);
 				break;
 			}
@@ -751,7 +761,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(28, this, target, 0);
 				break;
 			}
@@ -809,7 +819,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(5, this, target, 0);
 				if (target->State_Vulnerable)
 				{
@@ -826,7 +836,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(8, this, target, 0);
 				if (target->State_Vulnerable)
 				{
@@ -843,7 +853,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				this->Block *= 2;
 				break;
 			}
@@ -855,7 +865,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				this->Block *= 2;
 				break;
 			}
@@ -893,7 +903,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(12, this, NULL);
 				this->FlameBarrier += 4;
 				break;
@@ -906,7 +916,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(16, this, NULL);
 				this->FlameBarrier += 6;
 				break;
@@ -919,7 +929,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(10, this, NULL);
 				break;
 			}
@@ -931,7 +941,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(13, this, NULL);
 				break;
 			}
@@ -943,7 +953,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr); 
+				addToDiscard(cardnum); 
 				this->HP -= 3;
 				GameDeck[cardnum]->Damage(14, this, target, 0);
 				break;
@@ -956,7 +966,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				this->HP -= 2;
 				GameDeck[cardnum]->Damage(18, this, target, 0);
 				break;
@@ -1059,7 +1069,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				addToHand(131);
 				addToHand(131);
 				GameDeck[cardnum]->Defence(15, this, NULL);
@@ -1073,7 +1083,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				addToHand(131);
 				addToHand(131);
 				GameDeck[cardnum]->Defence(20, this, NULL);
@@ -1139,7 +1149,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(8 + RampageTime * 5, this, target, 0);
 				this->RampageTime += 1;
 				break;
@@ -1152,7 +1162,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(8 + RampageTime * 8, this, target, 0);
 				this->RampageTime += 1;
 				break;
@@ -1165,10 +1175,10 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 
 				GameDeck[cardnum]->Damage(7, this, target, 0);
-				addTo(130, DrawPile, DrawPtr);
+				addToDraw(130);
 				break;
 			}
 			else
@@ -1179,9 +1189,9 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(10, this, target, 0);
-				addTo(130, DrawPile, DrawPtr);
+				addToDraw(130);
 				break;
 			}
 			else
@@ -1194,7 +1204,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(12, this, target, 0);
 				break;
 			}
@@ -1206,7 +1216,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(16, this, target, 0);
 				break;
 			}
@@ -1244,7 +1254,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(5, this, NULL);
 				break;
 			}
@@ -1256,7 +1266,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Defence(8, this, NULL);
 				break;
 			}
@@ -1302,7 +1312,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(13, this, target, 0);
 				target->State_Vulnerable += 1;
 				target->State_Weak += 1;
@@ -1316,7 +1326,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 		{
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
-				addTo(cardnum, DiscardPile, DiscardPtr);
+				addToDiscard(cardnum);
 				GameDeck[cardnum]->Damage(13, this, target, 0);
 				target->State_Vulnerable += 2;
 				target->State_Weak += 2;
@@ -1328,7 +1338,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 
 		case 59: //旋风斩
 		{
-			addTo(cardnum, DiscardPile, DiscardPtr);
+			addToDiscard(cardnum);
 			if (Energy == 0)
 				return;
 			else
@@ -1346,7 +1356,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 
 		case 259: //旋风斩+
 		{
-			addTo(cardnum, DiscardPile, DiscardPtr);
+			addToDiscard(cardnum);
 			if (Energy == 0)
 				return;
 			else
@@ -1410,7 +1420,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 
 		case 62: //重锤
 		{
-			addTo(cardnum, DiscardPile, DiscardPtr);
+			addToDiscard(cardnum);
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
 				GameDeck[cardnum]->Damage(32, this, target, 0);
@@ -1422,7 +1432,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 
 		case 262: //重锤+
 		{
-			addTo(cardnum, DiscardPile, DiscardPtr);
+			addToDiscard(cardnum);
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
 				GameDeck[cardnum]->Damage(42, this, target, 0);
@@ -1518,11 +1528,11 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 
 		case 70: //燔祭
 		{
-			addTo(cardnum, DiscardPile, DiscardPtr);
+			addToDiscard(cardnum);
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
 				GameDeck[cardnum]->Damage(21, this, target, EnemyNum);
-				addTo(129, DiscardPile, DiscardPtr);
+				addToDiscard(129);
 				break;
 			}
 			else
@@ -1531,11 +1541,11 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 
 		case 270: //燔祭+
 		{
-			addTo(cardnum, DiscardPile, DiscardPtr);
+			addToDiscard(cardnum);
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
 				GameDeck[cardnum]->Damage(28, this, target, EnemyNum);
-				addTo(129, DiscardPile, DiscardPtr);
+				addToDiscard(129);
 				break;
 			}
 			else
@@ -1600,7 +1610,7 @@ void StateVariables::usecard(int cardnum, Enemy* target = NULL, int n = 0)
 
 		case 273: //突破极限+
 		{
-			addTo(cardnum, DiscardPile, DiscardPtr);
+			addToDiscard(cardnum);
 			if (GameDeck[cardnum]->EnergyConsume(this))
 			{
 				this->Strength *= 2;

@@ -24,16 +24,12 @@ public:
 	int GameDeckPoint;//游戏牌库牌数
 	Cards* Deck[100];//玩家牌库
 	int DeckPoint;//玩家牌库牌数
-	int* DeckPtr;//玩家牌库牌数指针
 	int DrawNum;
 	Cards* DrawPile[100];//抽牌堆
 	Cards* DiscardPile[100];
 	int DrawPoint;//抽牌堆牌数
-	int* DrawPtr;//抽牌堆牌数指针
 	int DiscardPoint;//弃牌堆牌数
-	int* DiscardPtr;//	弃牌堆牌数指针
 	int HandPoint;//手牌数
-	int* HandPtr;//手牌数指针
 	int StrengthUp;//每回合增加力量
 	int State_Vulnerable;//易伤
 	int State_Weak;//虚弱
@@ -52,11 +48,12 @@ public:
 	int Evolve;//进化效果
 	int EnemyNum;//怪物数量
 
-	void shuffle(Cards* Pile[], int* pilePoint);
+	void shuffle(Cards* Pile[], int pilePoint);
 	void draw(int drawnum);
 	void usecard(int cardnum, Enemy* target, int n);
-	void addTo(int cardnum, Cards* PileExample[], int* pilePoint);
+	void addToDiscard(int cardnum);
 	void addToHand(int cardnum);
+	void addToDraw(int cardnum);
 	void randomDamage(int damage, Enemy* target, int n);
 	void combust(Enemy* target, int EnemyNum);
 	void metallicize(Enemy* target, int EnemyNum);
