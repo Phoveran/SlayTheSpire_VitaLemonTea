@@ -9,56 +9,60 @@ class StateVariables
 public:
 	StateVariables(void);
 	~StateVariables(void);
-	int HP;//ç”Ÿå‘½å€¼
-	int HPMax;//ç”Ÿå‘½å€¼ä¸Šé™
-	int Energy;//æ³•åŠ›å€¼
-	int EnergyMax;//æ³•åŠ›å€¼ä¸Šé™
-	int Block;//æŠ¤ç›¾
-	int Strength;//åŠ›é‡
-	int StrengthUpTemp;//å•å›åˆå¢åŠ çš„åŠ›é‡
-	int Dexterity;//æ•æ·
-	int DexterityUpTemp;//å•å›åˆå¢åŠ çš„æ•æ·
-	int Gold;//é‡‘å¸
-	Cards* Hand[10];//æ‰‹ç‰Œ
-	Cards* GameDeck[300];//æ¸¸æˆç‰Œåº“
-	int GameDeckPoint;//æ¸¸æˆç‰Œåº“ç‰Œæ•°
-	Cards* Deck[100];//ç©å®¶ç‰Œåº“
-	int DeckPoint;//ç©å®¶ç‰Œåº“ç‰Œæ•°
-	int* DeckPtr;//ç©å®¶ç‰Œåº“ç‰Œæ•°æŒ‡é’ˆ
+	int HP;//ÉúÃüÖµ
+	int HPMax;//ÉúÃüÖµÉÏÏŞ
+	int Energy;//·¨Á¦Öµ
+	int EnergyMax;//·¨Á¦ÖµÉÏÏŞ
+	int Block;//»¤¶Ü
+	int Strength;//Á¦Á¿
+	int StrengthUpTemp;//µ¥»ØºÏÔö¼ÓµÄÁ¦Á¿
+	int Dexterity;//Ãô½İ
+	int DexterityUpTemp;//µ¥»ØºÏÔö¼ÓµÄÃô½İ
+	int Gold;//½ğ±Ò
+	Cards* Hand[10];//ÊÖÅÆ
+	Cards* GameDeck[300];//ÓÎÏ·ÅÆ¿â
+	int GameDeckPoint;//ÓÎÏ·ÅÆ¿âÅÆÊı
+	Cards* Deck[100];//Íæ¼ÒÅÆ¿â
+	int DeckPoint;//Íæ¼ÒÅÆ¿âÅÆÊı
+	int* DeckPtr;//Íæ¼ÒÅÆ¿âÅÆÊıÖ¸Õë
 	int DrawNum;
-	Cards* DrawPile[100];//æŠ½ç‰Œå †
+	Cards* DrawPile[100];//³éÅÆ¶Ñ
 	Cards* DiscardPile[100];
-	int DrawPoint;//æŠ½ç‰Œå †ç‰Œæ•°
-	int* DrawPtr;//æŠ½ç‰Œå †ç‰Œæ•°æŒ‡é’ˆ
-	int DiscardPoint;//å¼ƒç‰Œå †ç‰Œæ•°
-	int* DiscardPtr;//	å¼ƒç‰Œå †ç‰Œæ•°æŒ‡é’ˆ
-	int HandPoint;//æ‰‹ç‰Œæ•°
-	int* HandPtr;//æ‰‹ç‰Œæ•°æŒ‡é’ˆ
-	int StrengthUp;//æ¯å›åˆå¢åŠ åŠ›é‡
-	int State_Vulnerable;//æ˜“ä¼¤
-	int State_Weak;//è™šå¼±
-	int Berserk;//ä¸‹å›åˆå¼€å§‹è·å¾—Energy
-	int Frail;//è„†å¼±
-	int CantAttack;//å‡ å›åˆå†…ä¸èƒ½æ‰“å‡ºæ”»å‡»
-	int CanDraw;//æ˜¯å¦å¯ç»§ç»­æ‘¸ç‰Œ
-	int FlameBarrier;//ç«ç„°å±éšœæ•ˆæœ
-	int Juggernaut;//åŠ¿ä¸å¯æŒ¡æ•ˆæœ
-	int Combust;//Combustæ•ˆæœ
-	int Metallicize;//é‡‘å±åŒ–æ•ˆæœ
-	int RampageTime;//Rampageä½¿ç”¨æ¬¡æ•°
-	int Barricade;//Barricadeæ•ˆæœ
-	int Brutality;//Brutalityæ•ˆæœ
-	int Evolve;//è¿›åŒ–æ•ˆæœ
-	int EnemyNum;//æ€ªç‰©æ•°é‡
+	int DrawPoint;//³éÅÆ¶ÑÅÆÊı
+	int* DrawPtr;//³éÅÆ¶ÑÅÆÊıÖ¸Õë
+	int DiscardPoint;//ÆúÅÆ¶ÑÅÆÊı
+	int* DiscardPtr;//	ÆúÅÆ¶ÑÅÆÊıÖ¸Õë
+	int HandPoint;//ÊÖÅÆÊı
+	int* HandPtr;//ÊÖÅÆÊıÖ¸Õë
+	int StrengthUp;//Ã¿»ØºÏÔö¼ÓÁ¦Á¿
+	int State_Vulnerable;//Ò×ÉË
+	int State_Weak;//ĞéÈõ
+	int Berserk;//ÏÂ»ØºÏ¿ªÊ¼»ñµÃEnergy
+	int Frail;//´àÈõ
+	int CantAttack;//¼¸»ØºÏÄÚ²»ÄÜ´ò³ö¹¥»÷
+	int CanDraw;//ÊÇ·ñ¿É¼ÌĞøÃşÅÆ
+	int FlameBarrier;//»ğÑæÆÁÕÏĞ§¹û
+	int Juggernaut;//ÊÆ²»¿Éµ²Ğ§¹û
+	int Combust;//CombustĞ§¹û
+	int Metallicize;//½ğÊô»¯Ğ§¹û
+	int RampageTime;//RampageÊ¹ÓÃ´ÎÊı
+	int Rage;//¿ñÅ­Ğ§¹û
+	int Barricade;//BarricadeĞ§¹û
+	int Brutality;//BrutalityĞ§¹û
+	int Evolve;//½ø»¯Ğ§¹û
+	int EnemyNum;//¹ÖÎïÊıÁ¿
 
+	void shuffle(Cards* Pile[], int* pilePoint);
 	void draw(int drawnum);
 	void usecard(int cardnum, Enemy* target, int n);
 	void addTo(int cardnum, Cards* PileExample[], int* pilePoint);
+	void addToHand(int cardnum);
 	void randomDamage(int damage, Enemy* target, int n);
 	void combust(Enemy* target, int EnemyNum);
 	void metallicize(Enemy* target, int EnemyNum);
 	void Defend(int DefendVal, Enemy* target, int EnemyNum);
 	void brutality(void);
+	void GameDeckIni();
 };
 
 class Enemy
@@ -67,42 +71,51 @@ public:
 	Enemy(int hp, int damage1, int attackTimes1 = 1, int damage2 =0, int attackTimes2 = 0, int damage3 = 0, int attackTimes3 = 0);
 	Enemy(Enemy &example);
 	~Enemy(void);
-	int EnemyHP;//æ€ªç‰©è¡€é‡
-	int EnemyBlock;//æ€ªç‰©æŠ¤ç›¾
-	int Damage1;//æ€ªç‰©æ”»å‡»æ–¹æ¡ˆ1ä¼¤å®³
-	int AttackTimes1;//æ€ªç‰©æ”»å‡»æ–¹æ¡ˆ1æ¬¡æ•°
-	int Damage2;//æ€ªç‰©æ”»å‡»æ–¹æ¡ˆ2ä¼¤å®³
-	int AttackTimes2;//æ€ªç‰©æ”»å‡»æ–¹æ¡ˆ2æ¬¡æ•°
-	int Damage3;//æ€ªç‰©æ”»å‡»æ–¹æ¡ˆ3ä¼¤å®³
-	int AttackTimes3;//æ€ªç‰©æ”»å‡»æ–¹æ¡ˆ3æ¬¡æ•°
+	int EnemyHP;//¹ÖÎïÑªÁ¿
+	int EnemyBlock;//¹ÖÎï»¤¶Ü
+	int Damage1;//¹ÖÎï¹¥»÷·½°¸1ÉËº¦
+	int AttackTimes1;//¹ÖÎï¹¥»÷·½°¸1´ÎÊı
+	int Damage2;//¹ÖÎï¹¥»÷·½°¸2ÉËº¦
+	int AttackTimes2;//¹ÖÎï¹¥»÷·½°¸2´ÎÊı
+	int Damage3;//¹ÖÎï¹¥»÷·½°¸3ÉËº¦
+	int AttackTimes3;//¹ÖÎï¹¥»÷·½°¸3´ÎÊı
 
-	int State_Weak;//è™šå¼±
-	int State_Vulnerable;//æ˜“ä¼¤
-	int State_Poison;//ä¸­æ¯’
-	int State_Ritual;//ä»ªå¼ï¼šå›åˆç»“æŸåŠ æ”»
-	int Strength;//åŠ›é‡ï¼Œæ”»å‡»é™„åŠ ä¼¤å®³
-	int intend;//ä¸‹æ¬¡æ‰§è¡Œå‘½ä»¤
+	int State_Weak;//ĞéÈõ
+	int State_Vulnerable;//Ò×ÉË
+	int State_Poison;//ÖĞ¶¾
+	int State_Ritual;//ÒÇÊ½£º»ØºÏ½áÊø¼Ó¹¥
+	int Strength;//Á¦Á¿£¬¹¥»÷¸½¼ÓÉËº¦
+	int intend;//ÏÂ´ÎÖ´ĞĞÃüÁî
 	int Dexterity;
 
-	void debuffWeak(int n, StateVariables* player);//ä¸Šnå±‚è™šå¼±
-	void debuffCards(int cardnum, int n, StateVariables* player);//ç»™å¼ƒç‰Œå †ç‰Œ
-	void debuffVulnerable(int n, StateVariables* player);//ä¸Šnå±‚æ˜“ä¼¤
-	void buffRitual();//ä»ªå¼æ•ˆæœ
-	void buffStrengthUp(int n);//åŠ nåŠ›é‡
-	void buffFrail(int n, StateVariables* player);//ä¸Šnå±‚ç ´ç”²
-	void attack(int attackMethod, StateVariables* player);//å‘åŠ¨æ”»å‡»
-	void damage(int damage, StateVariables* target);//ä¼¤å®³å‡½æ•°
-	void deffend(int deffendVal);//æŠ¤ç›¾å‡½æ•°
-	void net(int n, StateVariables* player);//ä¸¢ç½‘æŠ€èƒ½
+	void debuffWeak(int n, StateVariables* player);//ÉÏn²ãĞéÈõ
+	void debuffCards(int cardnum, int n, StateVariables* player);//¸øÆúÅÆ¶ÑÅÆ
+	void debuffVulnerable(int n, StateVariables* player);//ÉÏn²ãÒ×ÉË
+	void buffRitual();//ÒÇÊ½Ğ§¹û
+	void buffStrengthUp(int n);//¼ÓnÁ¦Á¿
+	void buffFrail(int n, StateVariables* player);//ÉÏn²ãÆÆ¼×
+	void attack(int attackMethod, StateVariables* player);//·¢¶¯¹¥»÷
+	void damage(int damage, StateVariables* target);//ÉËº¦º¯Êı
+	void deffend(int deffendVal);//»¤¶Üº¯Êı
+	void net(int n, StateVariables* player);//¶ªÍø¼¼ÄÜ
+
+	void acidSlimeMiddle(StateVariables* player);
 };
 
 class Cards
 {
 public:
-	Cards(int cardnum, int EnergyCost);
+	Cards(int cardnum, int Cost, int kind, char* name);
 	~Cards(void);
-	unsigned int CardsNum;//å¡ç‰Œç¼–å·
-	int EnergyCost;//è´¹ç”¨
+	unsigned int CardsNum;//¿¨ÅÆ±àºÅ
+	int EnergyCost;//·ÑÓÃ
+	int Kind;//ÖÖÀà
+	CString suffix;
+	CString bigSuffix;
+	CString smallSuffix;
+	CString BigPicPath;
+	CString SmallPicPath;
+
 
 	int EnergyConsume(StateVariables* player);
 	void Damage(int damage, StateVariables* player, Enemy* target, int n);

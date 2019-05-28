@@ -1,11 +1,17 @@
-
+#include<string.h>
 #include "stdafx.h"
 #include "StateVariables.h"
 
-Cards::Cards(int cardnum, int Cost)
+Cards::Cards(int cardnum, int Cost, int kind, char* name)
 {
 	CardsNum = cardnum;
 	EnergyCost = Cost;
+	Kind = kind;
+	suffix = CString(".bmp");
+	bigSuffix = CString("_b");
+	smallSuffix = CString("_s");
+	BigPicPath = CString(name)+bigSuffix+suffix;
+	SmallPicPath = CString(name)+smallSuffix+suffix;
 }
 
 Cards::~Cards(void)
@@ -60,7 +66,7 @@ void Cards::Damage(int damage, StateVariables* player, Enemy* target, int n = 0)
 	}
 }
 
-void Cards::Defence(int block, StateVariables * player, Enemy* target = NULL)
+void Cards::Defence(int block, StateVariables* player, Enemy* target = NULL)
 {
 	double FrailCoefficient = (player->Frail > 0) ? 0.75 : 1;
 	int pre_block = int((block + player->Dexterity) * FrailCoefficient);
@@ -71,5 +77,15 @@ void Cards::Defence(int block, StateVariables * player, Enemy* target = NULL)
 			player->randomDamage(player->Juggernaut, target, player->EnemyNum);
 		}
 		player->Block += pre_block;
-  }
+	}
+}
+
+void StateVariables::GameDeckIni()
+{
+	*GameDeck[1] = Cards(1, 2, 0, "Bash");
+	*GameDeck[201] = Cards(201, 2, 0, "Bash");
+	*GameDeck[2] = Cards(2, 1, 1, "DefendR");
+	*GameDeck[3] = Cards(3, 1, 0, "StrikeR");
+	*GameDeck[4] = Cards(4, 0, 0, "Anger");
+	*GameDeck[6] = Cards(6, 1, 0, "BodySlam");
 }

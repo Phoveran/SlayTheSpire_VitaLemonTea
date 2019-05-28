@@ -20,7 +20,7 @@ Enemy::Enemy(int hp, int damage1, int attackTimes1, int damage2, int attackTimes
 	Dexterity = 0;
 }
 
-Enemy::Enemy(Enemy& example)
+Enemy::Enemy(Enemy &example)
 {
 	EnemyHP = example.EnemyHP;
 	EnemyBlock = example.EnemyBlock;
@@ -131,4 +131,26 @@ void Enemy::deffend(int deffendVal)
 void Enemy::net(int n, StateVariables* player)
 {
 	player->CantAttack += n;
+}
+
+void Enemy::acidSlimeMiddle(StateVariables* player)
+{
+	switch (intend)
+	{
+	case 1:
+	{
+		attack(1, player);
+	}break;
+	case 2:
+	{
+		attack(2, player);
+		debuffCards(132, 1, player);
+	}break;
+	case 3:
+	{
+		debuffWeak(1, player);
+	}break;
+	default:
+		break;
+	}
 }
